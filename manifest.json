@@ -1,0 +1,15 @@
+{
+	"manifest_version": 2,
+	"name": "Limit YT",
+	"version": "0.0.1",
+	"browser_action":{
+		"default_popup": "popup.html",
+		"default_title": "Limit YT!"
+	},
+	"background": {
+        "scripts": ["background.js"]
+    },
+    "permissions":[
+        "tabs"
+    ]
+}
