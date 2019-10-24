@@ -1,6 +1,6 @@
 console.log("Background working")
 videoCount = 0
-chrome.browserAction.setBadgeText({text: '0'})
+// chrome.browserAction.setBadgeText({text: '0'})
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
     // console.log(changeInfo.url);
@@ -11,12 +11,24 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 
         if(videoId){
             //save video ID
-                
+
+            chrome.storage.local.get(['dailyCount'], function(data){
+                if (data.dailyCount){
+                    //increment the count by one 
+                    data.dailyCount += 1
+                    chrome.storage.local.set({dailyCount: data.dailyCount})
+                } 
+                else {
+                    //if there was no video count
+                    data.dailyCount = 1
+                    chrome.storage.local.set({dailyCount: 1})
+                }
+                chrome.browserAction.setBadgeText({text: data.dailyCount.toString()})
+            })
         } 
         console.log(videoId);
         videoCount++;
         console.log("Url changed to ", changeInfo.url);
-        chrome.browserAction.setBadgeText({text: videoCount.toString()})
     }
 })
 
