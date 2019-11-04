@@ -1,4 +1,6 @@
 console.log("Background working")
+var newDay = {};
+var storage = [];
 videoCount = 0
 // chrome.browserAction.setBadgeText({text: '0'})
 
@@ -11,12 +13,13 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 
         if(videoId){
             //save video ID
-
             chrome.storage.local.get(['dailyCount'], function(data){
                 if (data.dailyCount){
                     //increment the count by one 
                     data.dailyCount += 1
                     chrome.storage.local.set({dailyCount: data.dailyCount})
+
+
                 } 
                 else {
                     //if there was no video count
@@ -48,5 +51,7 @@ function getVideoIdFromUrl(url){
     return url.match(regex) ? url.match(regex)[1]: null;
 }
 
-
-
+function addUpdateDateAndCountOfVideosInStorage(){
+    
+    storage.push()
+}
