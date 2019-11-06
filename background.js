@@ -52,6 +52,49 @@ function getVideoIdFromUrl(url){
 }
 
 function addUpdateDateAndCountOfVideosInStorage(){
-    
     storage.push()
 }
+
+
+function dateCountAvailabilityOn(date){
+    return new Promise((resolve, reject) => {
+        try{
+            chrome.storage.local.get(['dailyCount'], function(data){
+                if(data.dailyCount){
+                    if(data.dailyCount[date] != undefined){
+                        resolve(true)
+                    }
+                    else{
+                        resolve(false)
+                    }
+                }
+                else{
+                    reject("No dailyCount in Storage")
+                }
+            })
+        } catch{
+            reject("Error occured when checking dateCountAvailability");
+        }
+
+    })
+}
+
+async function incrementDateCount(date){
+    return new Promise((resolve, reject) => {
+        try {
+            const countAvailability = await dateCountAvailabilityOn(date)
+            resolve(true);
+            // if(countAvailability){
+            //     chrome.storage.local.get(['dailyCount'], function(data){
+            //         data.dailyCount[date] ++;
+            //         chrome.storage.local.set({dailyCount: data.dailyCount});
+            //     });
+            // }
+        } catch {
+            reject("Error occured when incrementing count on a date");
+        }
+    });
+}
+
+incrementDateCount("11/6/2019");
+
