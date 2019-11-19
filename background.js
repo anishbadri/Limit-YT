@@ -13,28 +13,33 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 
         if(videoId){
             //save video ID
-            chrome.storage.local.get(['dailyCount'], function(data){
-                if (data.dailyCount){
-                    //increment the count by one 
-                    data.dailyCount += 1
-                    chrome.storage.local.set({dailyCount: data.dailyCount})
-
-
-                } 
-                else {
-                    //if there was no video count
-                    data.dailyCount = 1
-                    chrome.storage.local.set({dailyCount: 1})
-                }
-                chrome.browserAction.setBadgeText({text: data.dailyCount.toString()})
-            })
+            incrementVideoCount(new Date().toLocaleDateString()).then((result)=> {updateBadge()})
         } 
         console.log(videoId);
-        videoCount++;
-        console.log("Url changed to ", changeInfo.url);
+        // videoCount++;
+        // console.log("Url changed to ", changeInfo.url);
     }
 })
 
+
+async function updateBadge(){
+    var videoCount = await getVideoCount(new Date().toLocaleDateString());
+    chrome.browserAction.setBadgeText({text: videoCount.toString()})
+}
+
+
+function getVideoCount(date){
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(['dailyCount'], function(data){
+            if(data.dailyCount[date]){
+                resolve(data.dailyCount[date])
+            }
+            else{
+                reject(0);
+            }
+        })
+    })
+}
 
 function isUrlActiveYTVideo(url){
     //watch regex
@@ -51,16 +56,12 @@ function getVideoIdFromUrl(url){
     return url.match(regex) ? url.match(regex)[1]: null;
 }
 
-function addUpdateDateAndCountOfVideosInStorage(){
-    storage.push()
-}
-
-
-function dateCountAvailabilityOn(date){
+function videoCountAvailabilityOn(date){
     return new Promise((resolve, reject) => {
         try{
             chrome.storage.local.get(['dailyCount'], function(data){
                 if(data.dailyCount){
+                    console.log(data.dailyCount[date]);
                     if(data.dailyCount[date] != undefined){
                         resolve(true)
                     }
@@ -79,22 +80,27 @@ function dateCountAvailabilityOn(date){
     })
 }
 
-async function incrementDateCount(date){
-    return new Promise((resolve, reject) => {
+function incrementVideoCount(date){
+    return new Promise(async (resolve, reject) => {
         try {
-            const countAvailability = await dateCountAvailabilityOn(date)
-            resolve(true);
-            // if(countAvailability){
-            //     chrome.storage.local.get(['dailyCount'], function(data){
-            //         data.dailyCount[date] ++;
-            //         chrome.storage.local.set({dailyCount: data.dailyCount});
-            //     });
-            // }
-        } catch {
+            const countAvailability = await videoCountAvailabilityOn(date)
+            chrome.storage.local.get(['dailyCount'], function(data){
+                if(countAvailability){
+                    data.dailyCount[date] ++;
+                }
+                else{
+                    data.dailyCount[date] = 1;
+                }
+                chrome.storage.local.set({dailyCount: data.dailyCount});
+                resolve(true);
+            })
+        } catch(err) {
+            console.log(err);
             reject("Error occured when incrementing count on a date");
         }
     });
 }
 
-incrementDateCount("11/6/2019");
+
+// incrementDateCount("11/6/2019");
 
